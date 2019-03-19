@@ -35,7 +35,7 @@ public class Main extends Application {
 		openItem.setOnAction(openAction);
 		player = new Player();
 		player.setTop(menuBar);
-		scene = new Scene(player, 640, 510, Color.BLACK);
+		scene = new Scene(player, 760, 540, Color.BLACK);
 		primaryStage.setScene(scene);
 		setStaticValues();
 		primaryStage.show();
@@ -54,13 +54,14 @@ public class Main extends Application {
 		if (file != null) {
 			try {
 				String playingFile = file.getCanonicalPath().toString();
-				//System.out.println(playingFile);
 				String playingFile1 = file.toURI().toURL().toExternalForm();
 				player = new Player(playingFile1);
 				player.setCurrentPath(playingFile.substring(0, playingFile.lastIndexOf('\\')));
 				player.setPlayingFile(playingFile.substring(playingFile.lastIndexOf('\\')+1));
 				player.setTop(menuBar);
-				scene = new Scene(player, 640, 535, Color.BLACK);
+				player.mediaBar.getFilesList();
+				player.setPlaylists();
+				scene = new Scene(player, 760, 540, Color.BLACK);
 				pStage.setScene(scene);
 				setStaticValues();
 				pStage.show();

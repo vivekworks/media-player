@@ -23,8 +23,8 @@ import application.Main;
 public class MediaBar extends HBox {
 
 	Button playButton = new Button("||");
-	Button previousButton = new Button("<<");
-	Button nextButton = new Button(">>");
+	Button previousButton = new Button("|<<");
+	Button nextButton = new Button(">>|");
 	Slider timeSlider = new Slider();
 	Slider volumeSlider = new Slider();
 	MediaPlayer mediaPlayer;
@@ -49,7 +49,6 @@ public class MediaBar extends HBox {
 		InvalidationListener timeSliderMovement = this::timerThread;
 		EventHandler<ActionEvent> nextButtonAction = this::playNextMedia;
 		EventHandler<ActionEvent> previousButtonAction = this::playPreviousMedia;
-		// playButton.setOnAction(new PlayAction<ActionEvent>());
 		playButton.setOnAction(playAction);
 		mediaPlayer.currentTimeProperty().addListener(timeSliderMovement);
 		timeSlider.valueProperty().addListener(timeNavigation);
@@ -63,7 +62,6 @@ public class MediaBar extends HBox {
 		getChildren().add(timeSlider);
 		getChildren().add(volumeLabel);
 		getChildren().add(volumeSlider);
-
 	}
 
 	public void handlePlayAndPause(ActionEvent event) {
@@ -107,18 +105,13 @@ public class MediaBar extends HBox {
 	public void playPreviousMedia(ActionEvent event) {
 		if (files == null || (files != null && files.length < 0)) {
 			getFilesList();
-			//System.out.println("After getFiles : "+files.length);
 		}
 		if (files != null) {
 			String playingFile = player.getPlayingFile();
-			System.out.println(playingFile);
 			for (int i = 0, flen = files.length; i < flen; i++) {
 				if (files[i].getName().equalsIgnoreCase(playingFile)) {
-					System.out.println(i+" : "+playingFile);
 					File previousFile = new File(player.getCurrentPath()+"\\"
 							+ files[i==0 ? files.length-1 : i-1].getName());
-					System.out.println(player.getCurrentPath()+"\\"
-							+ files[(files.length - ((i + 1) % files.length)) % files.length].getName());
 					playFile(previousFile);
 				}
 			}
@@ -128,36 +121,24 @@ public class MediaBar extends HBox {
 	public void playNextMedia(ActionEvent event) {
 		if (files == null || (files != null && files.length < 0)) {
 			getFilesList();
-			//System.out.println("After getFiles : "+files.length);
 		}
 		if (files != null) {
 			String playingFile = player.getPlayingFile();
-			System.out.println(playingFile);
 			for (int i = 0, flen = files.length; i < flen; i++) {
 				if (files[i].getName().equalsIgnoreCase(playingFile)) {
 					File nextFile = new File(player.getCurrentPath()+"\\"
 							+ files[(files.length + ((i + 1) % files.length)) % files.length].getName());
-					/*System.out.println(player.getCurrentPath()+"\\"
-							+ files[(files.length + ((i + 1) % files.length)) % files.length].getName());*/
 					playFile(nextFile);
 				}
 			}
 		}
 	}
 
-	private void getFilesList() {
+	public void getFilesList() {
 		if (files == null || (files != null && files.length < 0)) {
 			String currentPath = player.getCurrentPath();
-			System.out.println(player.getCurrentPath());
 			if (currentPath != null) {
-				//System.out.println(new File(currentPath).getAbsolutePath());
-//				try {
-//					//System.out.println(new File(currentPath).getCanonicalPath());
-//				} catch (IOException e) {
-//					System.out.println("Error");
-//				}
 				files = new File(currentPath).listFiles();
-				//System.out.println("Files :"+files);
 			}
 		}
 	}
@@ -166,7 +147,6 @@ public class MediaBar extends HBox {
 		if (file != null) {
 			try {
 				String playingFile = file.getCanonicalPath().toString();
-				System.out.println(playingFile);
 				String playingFile1 = file.toURI().toURL().toExternalForm();
 				if(mediaPlayer != null) {
 					mediaPlayer.stop();
@@ -175,7 +155,9 @@ public class MediaBar extends HBox {
 				player.setCurrentPath(playingFile.substring(0, playingFile.lastIndexOf('\\')));
 				player.setPlayingFile(playingFile.substring(playingFile.lastIndexOf('\\')+1));
 				player.setTop(Main.staticMenuBar);
-				Main.staticScene = new Scene(player, 640, 535, Color.BLACK);
+				player.mediaBar.getFilesList();
+				player.setPlaylists();
+				Main.staticScene = new Scene(player, 760, 540, Color.BLACK);
 				Main.staticStage.setScene(Main.staticScene);
 				Main.staticStage.show();
 			} catch (Exception e) {
@@ -183,23 +165,4 @@ public class MediaBar extends HBox {
 			}
 		}
 	}
-
-	/**
-	 * Opted out for EventHandler Functional Interface Definition
-	 * 
-	 * @author VivekTS
-	 * @param <T>
-	 */
-	/*
-	 * public class PlayAction<T extends ActionEvent> implements EventHandler<T> {
-	 * public void handle(ActionEvent event) { Status status =
-	 * mediaPlayer.getStatus(); if (status == Status.PLAYING) { if
-	 * (mediaPlayer.getCurrentTime().greaterThanOrEqualTo(mediaPlayer.
-	 * getTotalDuration())) { mediaPlayer.seek(mediaPlayer.getStartTime());
-	 * mediaPlayer.play(); playButton.setText("||"); } else { mediaPlayer.pause();
-	 * playButton.setText(">"); } } if (status == Status.HALTED || status ==
-	 * Status.PAUSED || status == Status.STOPPED) { mediaPlayer.play();
-	 * playButton.setText("||"); } } }
-	 */
-
 }
